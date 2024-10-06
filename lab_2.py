@@ -16,7 +16,7 @@ def bisection_method(function, interval):
         else:
             a = x
 
-    return (a + b) / 2
+    return x
 
 # Визначення функції
 func = lambda x: x**3 + 6*x**2 + 9*x + 1
@@ -26,4 +26,4 @@ array = [-1, 1]
 
 # Знаходження кореня
 root = bisection_method(func, array)
-print("Приближене значення кореня:", root)
+print("Приближене значення кореня:", func(root))
