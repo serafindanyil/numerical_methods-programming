@@ -1,34 +1,45 @@
 import numpy as np
 
 
-
 def function(x):
-    return x * np.sqrt(x ** 2 + 3)
+    return x * np.sqrt(x ** 2 + 3)  # Замінив оператор ^ на ** для піднесення до степеня
 
 
+def simpson_method(borders, f, n):
+    a, b = borders  # a - нижня межа, b - верхня межа
 
-def simpsons_method(lower_limit, upper_limit, number_of_intervals):
-    if number_of_intervals % 2 == 1:
-        raise ValueError("Number of intervals must be even.")
+    func_a, func_b = f(a), f(b)
 
-    step_size = (upper_limit - lower_limit) / number_of_intervals
-    integral_value = function(lower_limit) + function(upper_limit)
+    h = (b - a) / n
 
-    for index in range(1, number_of_intervals, 2):
-        integral_value += 4 * function(lower_limit + index * step_size)
+    integral = 0
 
-    for index in range(2, number_of_intervals - 1, 2):
-        integral_value += 2 * function(lower_limit + index * step_size)
+    # Метод для парних чисел
+    if n % 2 != 0:
+        n += 1
 
-    integral_value *= step_size / 3
-    return integral_value
+    # ітеруємось по н і перебираємо непарні точки
+    for i in range(1, n // 2 + 1):
+        x = a + (2 * i - 1) * h
+        integral += 4 * f(x)
+
+    # ітеруємось по н і перебираємо парні точки
+    for i in range(1, n // 2):
+        x = a + 2 * i * h
+        integral += 2 * f(x)
+
+    # Застосовуємо формулу сімпсона
+    integral = (h / 3) * (func_a + func_b + integral)
+
+    return integral
 
 
+borders = [1, 2]
 
-lower_limit = 1
-upper_limit = 2
-number_of_intervals = 10
+n = 100
 
+# Обчислюємо результат
+result = simpson_method(borders, function, n)
 
-result = simpsons_method(lower_limit, upper_limit, number_of_intervals)
-print(f"Approximate value of the integral: {result:.6f}")
+# Виводимо результат
+print(f"Інтеграл: {result}")
