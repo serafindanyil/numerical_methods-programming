@@ -1,72 +1,57 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Вхідні дані (константи)
-R1, R2, R3, R4 = 5, 4, 7, 2           # Опори в Омах
-L1, L2, L3 = 0.01, 0.02, 0.015         # Індуктивності в Генрі
-C1, C2, C3 = 300e-6, 150e-6, 200e-6    # Ємності в Фарадах
+r1, r2, r3, r4 = 5, 4, 7, 2
+l1, l2, l3 = 0.01, 0.02, 0.015
+c1, c2, c3 = 300e-6, 150e-6, 200e-6
 
-def modified_euler(U_max, f, t_integration, h):
-
-    # Кутова частота
+def modified_euler(u_max, f, t_integration, h):
     omega = 2 * np.pi * f
-
-    # Масив часу
     t_values = np.arange(0, t_integration, h)
-    U1 = U_max * np.sin(omega * t_values)  # Вхідна напруга як функція часу
+    u1 = u_max * np.sin(omega * t_values)
 
-    # Початкові значення
-    I1, I2, I3 = 0, 0, 0  # Струми через індуктивності
-    U_C1, U_C2 = 0, 0     # Напруги на конденсаторах
+    i1, i2, i3 = 0, 0, 0
+    u_c1, u_c2 = 0, 0
 
-    # Місце для збереження результатів
-    U2_output = []  # Напруга на виході U2
+    u2_output = []
 
-    # Основний цикл модифікованого методу Ейлера
-    for U_in in U1:
-        # Визначаємо похідні струмів та напруг
-        dI1_dt = (U_in - R1 * I1 - U_C1) / L1
-        dI2_dt = (U_C1 - R2 * I2 - U_C2) / L2
-        dI3_dt = (U_C2 - R3 * I3) / L3
-        dU_C1_dt = I1 / C1
-        dU_C2_dt = I2 / C2
+    for u_in in u1:
+        di1_dt = (u_in - r1 * i1 - u_c1) / l1
+        di2_dt = (u_c1 - r2 * i2 - u_c2) / l2
+        di3_dt = (u_c2 - r3 * i3) / l3
+        du_c1_dt = i1 / c1
+        du_c2_dt = i2 / c2
 
-        # Прогнозний крок
-        I1_star = I1 + h * dI1_dt
-        I2_star = I2 + h * dI2_dt
-        I3_star = I3 + h * dI3_dt
-        U_C1_star = U_C1 + h * dU_C1_dt
-        U_C2_star = U_C2 + h * dU_C2_dt
+        i1_star = i1 + h * di1_dt
+        i2_star = i2 + h * di2_dt
+        i3_star = i3 + h * di3_dt
+        u_c1_star = u_c1 + h * du_c1_dt
+        u_c2_star = u_c2 + h * du_c2_dt
 
-        # Коректорний крок
-        dI1_star_dt = (U_in - R1 * I1_star - U_C1_star) / L1
-        dI2_star_dt = (U_C1_star - R2 * I2_star - U_C2_star) / L2
-        dI3_star_dt = (U_C2_star - R3 * I3_star) / L3
-        dU_C1_star_dt = I1_star / C1
-        dU_C2_star_dt = I2_star / C2
+        di1_star_dt = (u_in - r1 * i1_star - u_c1_star) / l1
+        di2_star_dt = (u_c1_star - r2 * i2_star - u_c2_star) / l2
+        di3_star_dt = (u_c2_star - r3 * i3_star) / l3
+        du_c1_star_dt = i1_star / c1
+        du_c2_star_dt = i2_star / c2
 
-        # Оновлення значень методом модифікованого Ейлера
-        I1 += 0.5 * h * (dI1_dt + dI1_star_dt)
-        I2 += 0.5 * h * (dI2_dt + dI2_star_dt)
-        I3 += 0.5 * h * (dI3_dt + dI3_star_dt)
-        U_C1 += 0.5 * h * (dU_C1_dt + dU_C1_star_dt)
-        U_C2 += 0.5 * h * (dU_C2_dt + dU_C2_star_dt)
+        i1 += 0.5 * h * (di1_dt + di1_star_dt)
+        i2 += 0.5 * h * (di2_dt + di2_star_dt)
+        i3 += 0.5 * h * (di3_dt + di3_star_dt)
+        u_c1 += 0.5 * h * (du_c1_dt + du_c1_star_dt)
+        u_c2 += 0.5 * h * (du_c2_dt + du_c2_star_dt)
 
-        # Розрахунок вихідної напруги U2 на опорі R4
-        U2 = R4 * I3
-        U2_output.append(U2)
+        u2 = r4 * i3
+        u2_output.append(u2)
 
-    return t_values, np.array(U2_output)
+    return t_values, np.array(u2_output)
 
-# Викликаємо функцію з заданими параметрами
-t_values, U2_output = modified_euler(U_max=100, f=50, t_integration=0.2, h=0.00001)
+t_values, u2_output = modified_euler(u_max=100, f=50, t_integration=0.2, h=0.00001)
 
-# Побудова графіка
 plt.figure(figsize=(10, 6))
-plt.plot(t_values, U2_output, label='$U_2$ (Output Voltage)', color='blue')
-plt.title("Transient Response of Output Voltage $U_2$ in the RCL Circuit")
-plt.xlabel("Time (s)")
-plt.ylabel("Voltage $U_2$ (V)")
+plt.plot(t_values, u2_output, label='$u_2$ (вихідна напруга)')
+plt.title("перехідний процес вихідної напруги $u_2$ у rcl колі")
+plt.xlabel("час (с)")
+plt.ylabel("напруга $u_2$ (в)")
 plt.grid(True)
 plt.legend()
 plt.show()
